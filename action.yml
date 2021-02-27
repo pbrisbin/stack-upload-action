@@ -1,0 +1,34 @@
+name: Stack Upload
+description: Upload to Hackage via stack-upload
+inputs:
+  hackage-username: "Hackage username"
+    required: true
+  hackage-password: "Hackage username"
+    required: true
+  stack-arguments:
+    description: "Extra stack arguments"
+    required: true
+    default: ""
+  package:
+    description: "Package argument"
+    required: true
+    default: "."
+outputs: {}
+runs:
+  using: composite
+  steps:
+    - name: Setup
+      shell: bash
+      run: |
+        mkdir -p ~/.stack/upload
+        cat > ~/.stack/upload/credentials.json <<'EOM'
+        {
+          "username": "${{ inputs.hackage-username }}",
+          "password": "${{ inputs.hackage-password }}"
+        }
+        EOM
+
+    - name: Upload
+      shell: bash
+      run: |
+          stack upload ${{ inputs.stack-arguments }} ${{ inputs.package }}
